@@ -52,6 +52,7 @@
         <include name="org.apache.oltu.oauth2.resourceserver-0.31.jar" />
         <include name="org.apache.oltu.oauth2.resourceserver-filter-0.31.jar" />
         <include name="persistence-api-1.0.2.jar" />
+        <include name="signpost-core-1.2.1.2.jar" />
         <include name="servlet-api-3.0.jar" />
         <include name="slf4j-api-1.7.4.jar" />
         <include name="slf4j-log4j12-1.7.4.jar" />
@@ -71,6 +72,7 @@
 
         <include name="2net-shim-1.0.0.jar" />
         <include name="fitbit-shim-1.0.0.jar" />
+        <include name="withings-shim-1.0.0.jar" />
     </fileset>
     <path id="classpath.compile">
         <fileset refid="dependencies.compile"/>
@@ -114,6 +116,7 @@
         <include name="org.apache.oltu.oauth2.resourceserver-0.31.jar" />
         <include name="org.apache.oltu.oauth2.resourceserver-filter-0.31.jar" />
         <include name="persistence-api-1.0.2.jar" />
+        <include name="signpost-core-1.2.1.2.jar" />
         <include name="slf4j-api-1.7.4.jar" />
         <include name="slf4j-log4j12-1.7.4.jar" />
         <include name="spring-aop-3.2.1.RELEASE.jar" />
@@ -132,6 +135,7 @@
 
         <include name="2net-shim-1.0.0.jar" />
         <include name="fitbit-shim-1.0.0.jar" />
+        <include name="withings-shim-1.0.0.jar" />
     </fileset>
     
     <!-- Cleans up all of the temporary files generated during building. -->
