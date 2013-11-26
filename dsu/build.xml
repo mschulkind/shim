@@ -209,6 +209,8 @@
                 <include name="org/openmhealth/reference/data/**/*.java" />
                 <include name="org/openmhealth/reference/domain/**/*.java" />
                 <include name="org/openmhealth/reference/exception/**/*.java" />
+                <include name="org/openmhealth/reference/request/**/*.java" />
+                <include name="org/openmhealth/reference/servlet/**/*.java" />
                 <include name="org/openmhealth/reference/util/**/*.java" />
             </fileset>
             <classpath refid="classpath.compile"/>
@@ -234,6 +236,8 @@
             <include name="org/openmhealth/reference/data/**/*.java" />
             <include name="org/openmhealth/reference/domain/**/*.java" />
             <include name="org/openmhealth/reference/exception/**/*.java" />
+            <include name="org/openmhealth/reference/request/**/*.java" />
+            <include name="org/openmhealth/reference/servlet/**/*.java" />
             <include name="org/openmhealth/reference/util/**/*.java" />
         </jar>
     </target>
@@ -262,6 +266,8 @@
             <include name="org/openmhealth/reference/data/**/*.java" />
             <include name="org/openmhealth/reference/domain/**/*.java" />
             <include name="org/openmhealth/reference/exception/**/*.java" />
+            <include name="org/openmhealth/reference/request/**/*.java" />
+            <include name="org/openmhealth/reference/servlet/**/*.java" />
             <include name="org/openmhealth/reference/util/**/*.java" />
             <classpath refid="classpath.compile"/>
         </javac>
@@ -285,6 +291,8 @@
             <include name="org/openmhealth/reference/data/**/*.class" />
             <include name="org/openmhealth/reference/domain/**/*.class" />
             <include name="org/openmhealth/reference/exception/**/*.class" />
+            <include name="org/openmhealth/reference/request/**/*.class" />
+            <include name="org/openmhealth/reference/servlet/**/*.class" />
             <include name="org/openmhealth/reference/util/**/*.class" />
         </jar>
     </target>
