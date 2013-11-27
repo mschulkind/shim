@@ -134,6 +134,7 @@
         <include name="spring-webmvc-portlet-3.2.1.RELEASE.jar" />
 
         <include name="2net-shim-1.0.0.jar" />
+        <include name="blue_button_plus-shim-1.0.0.jar" />
         <include name="fitbit-shim-1.0.0.jar" />
         <include name="withings-shim-1.0.0.jar" />
     </fileset>

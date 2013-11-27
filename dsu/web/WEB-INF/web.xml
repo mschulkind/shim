@@ -134,6 +134,15 @@
     </listener>
      
     <!--  
+        Loads the BlueButtonPlus shim.
+    -->  
+    <listener>  
+        <listener-class>
+            org.openmhealth.shim.bluebuttonplus.BlueButtonPlusShimRegistry
+        </listener-class>  
+    </listener>
+
+    <!--  
         Loads the Fitbit shim.
     -->  
     <listener>  
