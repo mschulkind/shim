@@ -157,6 +157,12 @@ public abstract class OAuth2Authorization implements ShimAuthorization {
                             .encode(
                                 AuthorizeDomainRequest.buildUrl(request, null),
                                 "UTF-8"));
+
+            String scope = getScope();
+            if(scope != null) {
+                authorizeUrlBuilder
+                    .append("&scope=" + URLEncoder.encode(scope, "UTF-8"));
+            }
         }
         catch(UnsupportedEncodingException e) {
             throw new OmhException("The redirect URL could not be built.");
@@ -415,4 +421,11 @@ public abstract class OAuth2Authorization implements ShimAuthorization {
 	 * @return The shim's OAuth v2 client secret for Open mHealth.
 	 */
 	public abstract String getClientSecret();
+
+	/**
+	 * Returns the scope to use when requesting authorization.
+	 *
+	 * @return The scope to use when requesting authorization.
+	 */
+	public abstract String getScope();
 }
