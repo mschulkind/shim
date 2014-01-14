@@ -35,8 +35,12 @@
 
     <!-- Use annotations. -->
     <mvc:annotation-driven>
-        <!-- Use Jackson 2 to (de)serialize objects. -->
         <mvc:message-converters>
+            <bean
+                class="org.springframework.http.converter.StringHttpMessageConverter">
+            </bean>
+
+            <!-- Use Jackson 2 to (de)serialize objects. -->
             <bean
                 class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
 
