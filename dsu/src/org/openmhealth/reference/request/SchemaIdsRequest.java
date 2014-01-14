@@ -2,7 +2,6 @@ package org.openmhealth.reference.request;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -25,18 +24,18 @@ import org.openmhealth.shim.ShimRegistry;
 public class SchemaIdsRequest extends ListRequest<String> {
 	/**
 	 * Creates a request for the list of known schema IDs.
-	 * 
+	 *
 	 * @param numToSkip The number of schema IDs to skip.
-	 * 
+	 *
 	 * @param numToReturn The number of schema IDs to return.
-	 * 
+	 *
 	 * @throws OmhException A parameter was invalid.
 	 */
 	public SchemaIdsRequest(
 		final Long numToSkip,
 		final Long numToReturn)
 		throws OmhException {
-		
+
 		super(numToSkip, numToReturn);
 	}
 
@@ -52,32 +51,32 @@ public class SchemaIdsRequest extends ListRequest<String> {
 		else {
 			setServiced();
 		}
-		
+
 		// Get the number of records to skip and the number to return and store
 		// them as we will need to temporarily modify them.
 		long currNumToSkip = getNumToSkip();
 		long currNumToReturn = getNumToReturn();
 		long totalSchemasNeeded = currNumToSkip + currNumToReturn;
-		
+
 		// Get the set of known domains and convert it into a list for sorting.
 		List<String> domains =
 			new ArrayList<String>(ShimRegistry.getDomains());
 		Collections.sort(domains);
-		
+
 		// For each domain, get the list of known schema IDs.
 		Iterator<String> domainIterator = domains.iterator();
 		List<String> externalSchemaIds = new LinkedList<String>();
 		while(
 			domainIterator.hasNext() &&
 			(externalSchemaIds.size() < totalSchemasNeeded)) {
-			
+
 			Shim shim = ShimRegistry.getShim(domainIterator.next());
 			externalSchemaIds.addAll(shim.getSchemaIds());
 		}
-		
+
 		// Save the number of external schema IDs.
 		int numExternalSchemaIds = externalSchemaIds.size();
-		
+
 		// Remove the schema IDs that should be skipped and limit it by the
 		// number that should be returned.
 		externalSchemaIds =
@@ -88,7 +87,7 @@ public class SchemaIdsRequest extends ListRequest<String> {
 						Math.min(
 							externalSchemaIds.size(),
 							totalSchemasNeeded));
-		
+
 		// Compute the number of local schema IDs to skip and return.
 		if(numExternalSchemaIds >= totalSchemasNeeded) {
 			currNumToSkip = 0;
@@ -107,18 +106,13 @@ public class SchemaIdsRequest extends ListRequest<String> {
 		MultiValueResult<String> internalSchemaIds =
 			Registry
 				.getInstance().getSchemaIds(currNumToSkip, currNumToReturn);
-		
+
 		// Aggregate the two lists.
 		MultiValueResult<String> result =
 			(new MultiValueResultAggregator<String>(externalSchemaIds))
 			.add(internalSchemaIds)
 			.build();
-		
-		// Set the meta-data.
-		Map<String, Object> metaData = new HashMap<String, Object>();
-		metaData.put(METADATA_KEY_COUNT, result.count());
-		setMetaData(metaData);
-		
+
 		// Set the data.
 		setData(result);
 	}

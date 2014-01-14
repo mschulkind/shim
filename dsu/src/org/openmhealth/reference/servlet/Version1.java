@@ -45,7 +45,6 @@ import org.openmhealth.reference.data.AuthorizationCodeResponseBin;
 import org.openmhealth.reference.data.AuthorizationTokenBin;
 import org.openmhealth.reference.data.Registry;
 import org.openmhealth.reference.data.ThirdPartyBin;
-import org.openmhealth.reference.data.UserBin;
 import org.openmhealth.reference.domain.AuthenticationToken;
 import org.openmhealth.reference.domain.AuthorizationCode;
 import org.openmhealth.reference.domain.AuthorizationCodeResponse;
@@ -1260,11 +1259,6 @@ public class Version1 {
 			new UserActivationRequest(registrationId));
 	}
 
-	@RequestMapping(value = "testing", method = RequestMethod.GET)
-	public @ResponseBody User testing() {
-		return UserBin.getInstance().getUser("sink.thaw");
-	}
-
 	/**
 	 * If the root of the hierarchy is requested, return the registry, which is
 	 * a map of all of the schema IDs to their high-level information, e.g.
@@ -1284,7 +1278,9 @@ public class Version1 {
 	 *
 	 * @return An array of all of the known schemas, limited by paging.
 	 */
-	@RequestMapping(value = { "", "/" }, method = { RequestMethod.GET, RequestMethod.HEAD })
+	@RequestMapping(
+	    value = { "", "/" },
+	    method = { RequestMethod.GET, RequestMethod.HEAD })
 	public @ResponseBody MultiValueResult<String> getSchemaIds(
 		@RequestParam(
 			value = PARAM_PAGING_NUM_TO_SKIP,
@@ -1359,6 +1355,9 @@ public class Version1 {
 	 *
 	 * @param version
 	 *        The schema version from the URL.
+     *
+     * @param request
+     *        The HTTP request object.
 	 *
 	 * @param response
 	 *        The HTTP response object.
@@ -1642,11 +1641,26 @@ public class Version1 {
 
 		// If this is a list request, add the next and previous parameters.
 		if(request instanceof ListRequest) {
+		    // Cast the request.
+		    ListRequest<?> listRequest = (ListRequest<?>) request;
+
+		    // Get the results.
+            MultiValueResult<?> results = listRequest.getData();
+
+            // Add the count.
+            httpResponse
+                .setHeader(
+                    ListRequest.METADATA_KEY_COUNT,
+                    Integer.toString(results.size()));
+
+            // Add the total count.
+            httpResponse
+                .setHeader(
+                    ListRequest.METADATA_KEY_TOTAL_COUNT,
+                    Integer.toString(results.count()));
+
 			// Create the previous and next headers, if appropriate.
-			addNextPreviousHeaders(
-				httpRequest,
-				httpResponse,
-				(ListRequest<?>) request);
+			addNextPreviousHeaders(httpRequest, httpResponse, listRequest);
 		}
 
 		// Return the data.

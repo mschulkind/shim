@@ -1,7 +1,6 @@
 package org.openmhealth.reference.request;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -27,13 +26,13 @@ public class SchemaVersionsRequest extends ListRequest<Long> {
 
 	/**
 	 * Creates a request for the list of known versions for a given schema.
-	 * 
+	 *
 	 * @param schemaId The schema ID.
-	 * 
+	 *
 	 * @param numToSkip The number of schema versions to skip.
 	 *
 	 * @param numToReturn The number of schema versions to return.
-	 * 
+	 *
 	 * @throws OmhException A parameter was invalid.
 	 */
 	public SchemaVersionsRequest(
@@ -41,9 +40,9 @@ public class SchemaVersionsRequest extends ListRequest<Long> {
 		final Long numToSkip,
 		final Long numToReturn)
 		throws OmhException {
-		
+
 		super(numToSkip, numToReturn);
-		
+
 		// Validate the schema ID.
 		if(schemaId == null) {
 			throw new OmhException("The schema ID is missing.");
@@ -52,7 +51,7 @@ public class SchemaVersionsRequest extends ListRequest<Long> {
 			this.schemaId = schemaId;
 		}
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.openmhealth.reference.request.Request#service()
@@ -66,7 +65,7 @@ public class SchemaVersionsRequest extends ListRequest<Long> {
 		else {
 			setServiced();
 		}
-		
+
 		// Get the domain from the schema ID.
 		String domain;
 		try {
@@ -82,13 +81,13 @@ public class SchemaVersionsRequest extends ListRequest<Long> {
 		if(ShimRegistry.hasDomain(domain)) {
 			// Get the shim.
 			Shim shim = ShimRegistry.getShim(domain);
-			
+
 			// Get all of the visible versions.
 			List<Long> versions = shim.getSchemaVersions(schemaId);
-			
+
 			// Sort the list of versions.
 			Collections.sort(versions);
-			
+
 			// Generate the paged result.
 			versions =
 				versions
@@ -97,9 +96,9 @@ public class SchemaVersionsRequest extends ListRequest<Long> {
 						(int) Math.min(
 							getNumToSkip() + getNumToReturn(),
 							versions.size()));
-			
+
 			// Create the result from the sorted, paged list of versions.
-			result = (new MultiValueResultAggregator<Long>(versions)).build(); 
+			result = (new MultiValueResultAggregator<Long>(versions)).build();
 		}
 		// Otherwise, query our internal schemas.
 		else {
@@ -107,16 +106,11 @@ public class SchemaVersionsRequest extends ListRequest<Long> {
 				Registry
 					.getInstance()
 						.getSchemaVersions(
-							schemaId, 
-							getNumToSkip(), 
+							schemaId,
+							getNumToSkip(),
 							getNumToReturn());
 		}
-		
-		// Set the meta-data.
-		Map<String, Object> metaData = new HashMap<String, Object>();
-		metaData.put(METADATA_KEY_COUNT, result.count());
-		setMetaData(metaData);
-		
+
 		// Set the data.
 		setData(result);
 	}

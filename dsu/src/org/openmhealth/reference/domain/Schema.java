@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright 2013 Open mHealth
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -31,11 +31,11 @@ import com.fasterxml.jackson.databind.JsonNode;
  * <p>
  * A schema as defined by the Open mHealth specification.
  * </p>
- * 
+ *
  * <p>
  * This class is immutable.
  * </p>
- * 
+ *
  * @author John Jenkins
  */
 public class Schema implements OmhObject {
@@ -43,7 +43,7 @@ public class Schema implements OmhObject {
 	 * The version of this class for serialization purposes.
 	 */
 	private static final long serialVersionUID = 1L;
-	
+
 	/**
 	 * The pattern to use for validating schema IDs.
 	 */
@@ -89,16 +89,16 @@ public class Schema implements OmhObject {
 
 	/**
 	 * Creates a new schema (registry entry).
-	 * 
+	 *
 	 * @param id
 	 *        The ID for this schema.
-	 * 
+	 *
 	 * @param version
 	 *        The version of this schema.
-	 * 
+	 *
 	 * @param schema
 	 *        The Concordia schema that defines this Schema object.
-	 * 
+	 *
 	 * @throws OmhException
 	 *         A parameter was invalid.
 	 */
@@ -122,7 +122,7 @@ public class Schema implements OmhObject {
 
 		// Validate the version.
 		this.version = validateVersion(version);
-		
+
 		// Make sure the schema is not null.
 		if(schema == null) {
 			throw new OmhException("The schema is null.");
@@ -134,7 +134,7 @@ public class Schema implements OmhObject {
 
 	/**
 	 * Returns the unique identifier for this schema.
-	 * 
+	 *
 	 * @return The unique identifier for this schema.
 	 */
 	public String getId() {
@@ -143,7 +143,7 @@ public class Schema implements OmhObject {
 
 	/**
 	 * Returns the version of this schema.
-	 * 
+	 *
 	 * @return The version of this schema.
 	 */
 	public long getVersion() {
@@ -152,7 +152,7 @@ public class Schema implements OmhObject {
 
 	/**
 	 * Returns the schema.
-	 * 
+	 *
 	 * @return The schema.
 	 */
 	public Concordia getSchema() {
@@ -161,20 +161,20 @@ public class Schema implements OmhObject {
 
 	/**
 	 * Validates some data.
-	 * 
+	 *
 	 * @param owner
 	 *        The owner of the data that is being validated. This is needed to
 	 *        build the {@link Data} object.
-	 * 
+	 *
 	 * @param metaData
 	 *        The meta-data for the data that is being validated. This is
 	 *        needed to build the {@link Data} object.
-	 * 
+	 *
 	 * @param data
 	 *        The data to be validated.
-	 * 
+	 *
 	 * @return The validated data as a {@link Data} object.
-	 * 
+	 *
 	 * @throws OmhException
 	 *         The data was null or invalid.
 	 */
@@ -188,7 +188,7 @@ public class Schema implements OmhObject {
 		if(data == null) {
 			throw new OmhException("The data field is null.");
 		}
-		
+
 		// Validate the data.
 		try {
 			schema.validateData(data);
@@ -196,19 +196,19 @@ public class Schema implements OmhObject {
 		catch(ConcordiaException e) {
 			throw new OmhException("The data is invalid.", e);
 		}
-		
+
 		// Return the result.
 		return new Data(owner, id, version, metaData, data);
 	}
 
 	/**
 	 * Validates that the ID follows our rules.
-	 * 
+	 *
 	 * @param id
 	 *        The ID to be validated.
-	 * 
+	 *
 	 * @return The validated and, potentially, simplified schema, e.g. trimmed.
-	 * 
+	 *
 	 * @throws OmhException
 	 *         The ID is invalid.
 	 */
@@ -217,15 +217,15 @@ public class Schema implements OmhObject {
 		if(id == null) {
 			throw new OmhException("The ID is null.");
 		}
-		
+
 		// Remove surrounding whitespace.
 		String idTrimmed = id.trim();
-		
+
 		// Validate that the ID is not empty or only whitespace.
 		if(idTrimmed.length() == 0) {
 			throw new OmhException("The ID is empty or only whitespace.");
 		}
-		
+
 		// Validate that the trimmed ID matches the pattern.
 		if(! PATTERN_ID.matcher(idTrimmed).matches()) {
 			throw
@@ -236,19 +236,19 @@ public class Schema implements OmhObject {
 						"\"omh\": " +
 						idTrimmed);
 		}
-		
+
 		// Return the trimmed ID.
 		return idTrimmed;
 	}
 
 	/**
 	 * Validates that the version follows our rules.
-	 * 
+	 *
 	 * @param version
 	 *        The version to be validated.
-	 * 
+	 *
 	 * @return The version as it was given.
-	 * 
+	 *
 	 * @throws OmhException
 	 *         The version is invalid.
 	 */
@@ -266,12 +266,12 @@ public class Schema implements OmhObject {
 
 	/**
 	 * Validates that the chunk size follows our rules.
-	 * 
+	 *
 	 * @param chunkSize
 	 *        The chunk size to validate.
-	 * 
+	 *
 	 * @return The chunk size as it was given.
-	 * 
+	 *
 	 * @throws OmhException
 	 *         The chunk size is invalid.
 	 */

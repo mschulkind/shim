@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright 2013 Open mHealth
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -82,28 +82,28 @@ public class DataReadRequest extends ListRequest<Data> {
 
 	/**
 	 * Creates a request for data.
-	 * 
+	 *
 	 * @param authenticationToken The requesting user's authentication token.
-	 * 
+	 *
 	 * @param authorizationToken The third-party's authorization token.
-	 * 
+	 *
 	 * @param schemaId The ID of the schema from which the data was generated.
-	 * 
+	 *
 	 * @param version The version of the schema from which the data was
 	 * 				  generated.
-	 * 
+	 *
 	 * @param owner Defines whose data should be read.
-	 * 
+	 *
 	 * @param startDate The earliest point from which data should be read.
-	 * 
+	 *
 	 * @param endDate The latest point from which data should be read.
-	 * 
+	 *
 	 * @param columnList The list of columns in the data to return.
-	 * 
+	 *
 	 * @param numToSkip The number of data points to skip.
-	 * 
+	 *
 	 * @param numToReturn The number of data points to return.
-	 * 
+	 *
 	 * @throws OmhException A parameter was invalid.
 	 */
 	public DataReadRequest(
@@ -118,9 +118,9 @@ public class DataReadRequest extends ListRequest<Data> {
 		final Long numToSkip,
 		final Long numToReturn)
 		throws OmhException {
-		
+
 		super(numToSkip, numToReturn);
-		
+
 		if((authenticationToken == null) && (authorizationToken == null)) {
 			throw
 				new InvalidAuthenticationException(
@@ -153,18 +153,18 @@ public class DataReadRequest extends ListRequest<Data> {
 		else {
 			setServiced();
 		}
-		
+
 		// Create a handle for the validated user-name of the user whose data
 		// is desired.
 		String username = owner;
-		
+
 		// Get the user-name associated with the authentication token, if one
 		// was given.
 		String authenticationUsername = null;
 		if(authenticationToken != null) {
 			authenticationUsername = authenticationToken.getUsername();
 		}
-		
+
 		// Get the user-name associated with the authorization token, if one
 		// was given.
 		String authorizationUsername = null;
@@ -174,7 +174,7 @@ public class DataReadRequest extends ListRequest<Data> {
 					.getAuthorizationCodeVerification()
 					.getOwnerUsername();
 		}
-		
+
 		// If the requester did not give a user-name use the authentication and
 		// authorization tokens to infer one.
 		if(username == null) {
@@ -199,7 +199,7 @@ public class DataReadRequest extends ListRequest<Data> {
 							"information.");
 			}
 		}
-		
+
 		// If the authentication token was given and it refers to the user in
 		// question, ensure that the token is valid.
 		if(username.equals(authenticationUsername)) {
@@ -220,14 +220,14 @@ public class DataReadRequest extends ListRequest<Data> {
 					new InvalidAuthorizationException(
 						"The authorization token has expired.");
 			}
-			// Ensure that the authorization token grants access to the 
+			// Ensure that the authorization token grants access to the
 			// requested schema.
 			else if(
 				! authorizationToken
 					.getAuthorizationCode()
 					.getScopes()
 					.contains(schemaId)) {
-				
+
 				throw
 					new InvalidAuthorizationException(
 						"The given authorization token does not grant the " +
@@ -246,17 +246,17 @@ public class DataReadRequest extends ListRequest<Data> {
 					"Insufficient credentials were provided to read the " +
 						"requested user's data.");
 		}
-		
+
 		// Get the domain.
 		String domain = parseDomain(schemaId);
-		
+
 		// Check to be sure the schema is known.
 		if(
 			(! ShimRegistry.hasDomain(domain)) &&
 			(Registry
 				.getInstance()
 				.getSchemas(schemaId, version, 0, 1).count() == 0)) {
-			
+
 			throw
 				new NoSuchSchemaException(
 					"The schema ID, '" +
@@ -265,20 +265,20 @@ public class DataReadRequest extends ListRequest<Data> {
 						version +
 						"', pair is unknown.");
 		}
-		
+
 		// Get the data.
 		MultiValueResult<Data> result;
 		// Check if a shim should handle the request.
 		if(ShimRegistry.hasDomain(domain)) {
 			// Get the shim.
 			Shim shim = ShimRegistry.getShim(domain);
-			
+
 			// Lookup the user's authorization code.
 			ExternalAuthorizationToken token =
 				ExternalAuthorizationTokenBin
 					.getInstance()
 					.getToken(username, domain);
-			
+
 			// If the token does not exist, return an error. Clients should
 			// first check to be sure that the user has already authorized this
 			// domain.
@@ -287,7 +287,7 @@ public class DataReadRequest extends ListRequest<Data> {
 					new OmhException(
 						"The user has not yet authorized this domain.");
 			}
-			
+
 			// Get the data from the shim.
 			List<Data> resultList =
 				shim
@@ -300,7 +300,7 @@ public class DataReadRequest extends ListRequest<Data> {
 						columnList,
 						getNumToSkip(),
 						getNumToReturn());
-			
+
 			// Convert the List object into a MultiValueResult object.
 			result =
 				(new MultiValueResultAggregator<Data>(resultList)).build();
@@ -311,21 +311,16 @@ public class DataReadRequest extends ListRequest<Data> {
 				DataSet
 					.getInstance()
 					.getData(
-						username, 
-						schemaId, 
+						username,
+						schemaId,
 						version,
 						startDate,
 						endDate,
-						columnList, 
-						getNumToSkip(), 
+						columnList,
+						getNumToSkip(),
 						getNumToReturn());
 		}
-		
-		// Set the meta-data.
-		Map<String, Object> metaData = new HashMap<String, Object>();
-		metaData.put(METADATA_KEY_COUNT, result.count());
-		setMetaData(metaData);
-		
+
 		// Set the data.
 		setData(result);
 	}
@@ -338,12 +333,12 @@ public class DataReadRequest extends ListRequest<Data> {
 	public Map<String, String> getPreviousNextParameters() {
 		// Create the result map.
 		Map<String, String> result = new HashMap<String, String>();
-		
+
 		// Add the owner if given.
 		if(owner != null) {
 			result.put(Version1.PARAM_OWNER, owner);
 		}
-		
+
 		// Add the start date if given.
 		if(startDate != null) {
 			result
@@ -351,7 +346,7 @@ public class DataReadRequest extends ListRequest<Data> {
 					Version1.PARAM_DATE_START,
 					ISOW3CDateTimeFormat.any().print(startDate));
 		}
-		
+
 		// Add the start date if given.
 		if(endDate != null) {
 			result
@@ -359,12 +354,12 @@ public class DataReadRequest extends ListRequest<Data> {
 					Version1.PARAM_DATE_END,
 					ISOW3CDateTimeFormat.any().print(endDate));
 		}
-		
+
 		// Add the columns if they were given.
 		if((columnList != null) && (columnList.size() > 0)) {
 			result.put(Version1.PARAM_COLUMN_LIST, columnList.toString());
 		}
-		
+
 		// Return the map.
 		return result;
 	}
