@@ -22,9 +22,9 @@ import java.io.IOException;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.servlet.ServletContext;
 
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * <p>
@@ -41,7 +41,7 @@ import javax.servlet.ServletContextListener;
  *
  * @author John Jenkins
  */
-public class ConfigurationFileImport implements ServletContextListener {
+public class ConfigurationFileImport {
 	/**
 	 * The location of the default configuration file.
 	 */
@@ -64,6 +64,9 @@ public class ConfigurationFileImport implements ServletContextListener {
 	private static final Logger LOGGER =
 		Logger.getLogger(ConfigurationFileImport.class.getName());
 
+    @Autowired
+    private ServletContext servletContext;
+
 	/**
 	 * Default constructor.
 	 */
@@ -75,16 +78,14 @@ public class ConfigurationFileImport implements ServletContextListener {
 	 * Find the log file, if it exists, and add its properties to the system
 	 * properties.
 	 */
-	@Override
-	public void contextInitialized(final ServletContextEvent event) {
+    public void init() {
 		// Get the system properties.
 		Properties properties = System.getProperties();
 
 		// Load the default properties.
 		File defaultConfiguration =
 			new File(
-				event.getServletContext().getRealPath("/") +
-					CONFIG_FILE_DEFAULT);
+				servletContext.getRealPath("/") + CONFIG_FILE_DEFAULT);
 		try {
 			properties.load(new FileReader(defaultConfiguration));
 		}
@@ -141,14 +142,5 @@ public class ConfigurationFileImport implements ServletContextListener {
 
 		// Update the system properties.
 		System.setProperties(properties);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see javax.servlet.ServletContextListener#contextDestroyed(javax.servlet.ServletContextEvent)
-	 */
-	@Override
-	public void contextDestroyed(final ServletContextEvent event) {
-		// Do nothing.
 	}
 }

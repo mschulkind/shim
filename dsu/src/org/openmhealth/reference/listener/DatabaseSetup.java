@@ -20,9 +20,6 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
-
 import org.openmhealth.reference.data.Dao;
 
 /**
@@ -37,7 +34,7 @@ import org.openmhealth.reference.data.Dao;
  *
  * @author John Jenkins
  */
-public class DatabaseSetup implements ServletContextListener {
+public class DatabaseSetup {
 	/**
 	 * A {@link Logger} for this class.
 	 */
@@ -65,8 +62,7 @@ public class DatabaseSetup implements ServletContextListener {
 	 * Setup the connection to the database. See the configuration file to
 	 * change which database is setup.
 	 */
-	@Override
-	public void contextInitialized(final ServletContextEvent event) {
+    public void init() {
 		LOGGER.info("Setting up the DAO.");
 
 		// Get the properties.
@@ -118,11 +114,10 @@ public class DatabaseSetup implements ServletContextListener {
 	/**
 	 * Closes the connection to the database.
 	 */
-	@Override
-	public void contextDestroyed(final ServletContextEvent event) {
-		if(dao != null) {
-			LOGGER.info("Shutting down the DAO.");
-			dao.shutdown();
-		}
-	}
+    public void destroy() {
+        if(dao != null) {
+            LOGGER.info("Shutting down the DAO.");
+            dao.shutdown();
+        }
+    }
 }

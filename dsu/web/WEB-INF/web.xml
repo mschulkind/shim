@@ -96,13 +96,6 @@
      </listener>
       -->
     
-    <!-- Loads the configuration file. -->
-    <listener>
-        <listener-class>
-            org.openmhealth.reference.listener.ConfigurationFileImport
-        </listener-class>
-    </listener>
-    
     <!-- 
         Sets up logging. This must come after the configuration file import
         listener.
@@ -113,16 +106,6 @@
         </listener-class>
     </listener>
 
-    <!--
-        Sets up the connection to the database. This must come after the
-        configuration file import listener.
-     -->
-     <listener>
-        <listener-class>
-            org.openmhealth.reference.listener.DatabaseSetup
-        </listener-class>
-    </listener>
-  
     <!--  
         Loads the Spring web application context using the configuration file
         defined above.  

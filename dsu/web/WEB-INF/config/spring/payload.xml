@@ -33,6 +33,24 @@
         <property name="maxUploadSize" value="5242880" />
     </bean>
 
+    <!-- Loads the configuration file. -->
+    <bean
+        id="configurationFileImport"
+        class="org.openmhealth.reference.listener.ConfigurationFileImport"
+        init-method="init">
+    </bean>
+
+    <!--
+        Sets up the connection to the database. This must come after the
+        configuration file import listener.
+     -->
+    <bean
+        id="databaseSetup"
+        class="org.openmhealth.reference.listener.DatabaseSetup"
+        init-method="init" 
+        destroy-method="destroy">
+    </bean>
+
     <!-- Use annotations. -->
     <mvc:annotation-driven>
         <mvc:message-converters>
