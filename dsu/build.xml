@@ -173,12 +173,39 @@
         </junit>
     </target>
 
-	<!-- Builds the WAR file. -->
-    <target name="dist" depends="javac, test" description="Builds the WAR file.">
+    <!-- Create the directory for the results if they don't exist. -->
+    <mkdir dir="${dist}" />
+
+    <manifestclasspath 
+        property="dpu.manifest.classpath" 
+        jarfile="${dist}/dpu.jar">
+        <classpath>
+            <fileset dir="${lib}" includes="*.jar" />
+        </classpath>
+    </manifestclasspath>
+
+    <target name="dpu_jar" depends="javac">
+        <jar 
+            destfile="${dist}/dpu.jar"
+            basedir="${build}/classes">
+            <manifest>
+                <attribute 
+                    name="Class-Path" 
+                    value="${dpu.manifest.classpath}" />
+                <attribute 
+                    name="Main-Class" 
+                    value="org.openmhealth.reference.dpu.ManualRunner"/>
+            </manifest>
+            <zipfileset dir="${web}/WEB-INF">
+                <include name="**" />
+            </zipfileset>
+        </jar>
+    </target>
+
+	<!-- Builds the WAR and JAR files. -->
+    <target name="dist" depends="dpu_jar, javac, test" description="Builds the WAR and JAR files.">
         <!-- Create the META-INF directory if it doesn't exist. -->
         <mkdir dir="${web}/META-INF" />
-    	<!-- Create the directory for the results if they don't exist. -->
-        <mkdir dir="${dist}" />
         <war
             webxml="${web}/WEB-INF/web.xml"
             destfile="${dist}/omh.war">
@@ -187,6 +214,9 @@
             <lib refid="dependencies.run" />
             <webinf dir="${web}/WEB-INF" />
             <metainf dir="${web}/META-INF" />
+            <zipfileset dir="${web}" 
+                includes="WEB-INF/config/default.conf"
+                fullpath="WEB-INF/classes/config/default.conf"/>
             <zipfileset dir="${web}">
                 <exclude name="META-INF/**" />
                 <exclude name="WEB-INF/**" />

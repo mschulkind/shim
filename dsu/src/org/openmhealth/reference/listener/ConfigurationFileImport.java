@@ -24,8 +24,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletContext;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
 /**
  * <p>
  * Attempts to read the configuration file, if it exists, and stores it. Any
@@ -46,7 +44,7 @@ public class ConfigurationFileImport {
 	 * The location of the default configuration file.
 	 */
 	private static final String CONFIG_FILE_DEFAULT =
-		"/WEB-INF/config/default.conf";
+		"config/default.conf";
 	/**
 	 * The default location for the configuration file on Windows.
 	 */
@@ -64,9 +62,6 @@ public class ConfigurationFileImport {
 	private static final Logger LOGGER =
 		Logger.getLogger(ConfigurationFileImport.class.getName());
 
-    @Autowired
-    private ServletContext servletContext;
-
 	/**
 	 * Default constructor.
 	 */
@@ -83,20 +78,10 @@ public class ConfigurationFileImport {
 		Properties properties = System.getProperties();
 
 		// Load the default properties.
-		File defaultConfiguration =
-			new File(
-				servletContext.getRealPath("/") + CONFIG_FILE_DEFAULT);
 		try {
-			properties.load(new FileReader(defaultConfiguration));
-		}
-		// The default properties file didn't exist, which is alarming.
-		catch(FileNotFoundException e) {
-			LOGGER
-				.log(
-					Level.WARNING,
-					"The default properties file is missing: " +
-						defaultConfiguration.getAbsolutePath(),
-					e);
+			properties.load(
+                ConfigurationFileImport.class.getClassLoader()
+                    .getResourceAsStream(CONFIG_FILE_DEFAULT));
 		}
 		// There was an error reading the default properties file.
 		catch(IOException e) {
@@ -105,7 +90,7 @@ public class ConfigurationFileImport {
 					Level.WARNING,
 					"There was an error reading the default properties " +
 						"file: " +
-						defaultConfiguration.getAbsolutePath(),
+                        CONFIG_FILE_DEFAULT,
 					e);
 		}
 
