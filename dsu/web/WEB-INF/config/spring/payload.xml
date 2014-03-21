@@ -37,8 +37,7 @@
     <bean
         id="configurationFileImport"
         class="org.openmhealth.reference.listener.ConfigurationFileImport"
-        init-method="init">
-    </bean>
+        init-method="init"/>
 
     <!--
         Sets up the connection to the database. This must come after the
@@ -48,8 +47,7 @@
         id="databaseSetup"
         class="org.openmhealth.reference.listener.DatabaseSetup"
         init-method="init" 
-        destroy-method="destroy">
-    </bean>
+        destroy-method="destroy"/>
 
     <!-- Use annotations. -->
     <mvc:annotation-driven>
