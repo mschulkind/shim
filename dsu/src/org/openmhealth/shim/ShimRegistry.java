@@ -5,9 +5,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
-
 /**
  * <p>
  * The registry of shim implementations.
@@ -15,7 +12,7 @@ import javax.servlet.ServletContextListener;
  *
  * @author John Jenkins
  */
-public abstract class ShimRegistry implements ServletContextListener {
+public abstract class ShimRegistry {
 	/**
 	 * The map of domains to the {@link Shim} that can handle them.
 	 */
@@ -32,17 +29,8 @@ public abstract class ShimRegistry implements ServletContextListener {
 	/**
 	 * Call into the sub-class to add it to the registry.
 	 */
-	@Override
-	public final void contextInitialized(final ServletContextEvent event) {
+    public void init() {
 		add(getShim());
-	}
-	
-	/**
-	 * Prevent sub-classes from interfering with the initialization process.
-	 */
-	@Override
-	public final void contextDestroyed(final ServletContextEvent event) {
-		// Do nothing.
 	}
 	
 	/**
