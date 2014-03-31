@@ -96,10 +96,9 @@ public class OmhObjectMapper extends ObjectMapper {
     	new SimpleFilterProvider();
 
 	/**
-	 * Creates the object mapper and initializes the filters. This is private
-	 * as it should only ever be called by Spring via reflection.
-	 */
-	private OmhObjectMapper() {
+	 * Creates the object mapper and initializes the filters. 
+     */
+	public OmhObjectMapper() {
 		// Ensure that unknown fields are ignored.
 		FILTER_PROVIDER.setFailOnUnknownId(false);
 		
