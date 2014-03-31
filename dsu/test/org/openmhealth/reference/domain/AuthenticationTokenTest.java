@@ -197,7 +197,7 @@ public class AuthenticationTokenTest {
 		Assert
 			.assertEquals(
 				authToken.getGranted() +
-					AuthenticationToken.AUTH_TOKEN_LIFETIME,
+					AuthenticationToken.AUTH_TOKEN_LIFETIME_MS,
 				authToken.getExpires());
 	}
 }

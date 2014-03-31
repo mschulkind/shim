@@ -55,7 +55,7 @@ public class AuthenticationToken implements OmhObject {
 	/**
 	 * The default duration of the authentication token.
 	 */
-	public static final Long AUTH_TOKEN_LIFETIME = 1000 * 60 * 30L;
+	public static final Long AUTH_TOKEN_LIFETIME_MS = 1000 * 60 * 60 * 24 * 7L;
 	
 	/**
 	 * The authentication token.
@@ -97,7 +97,7 @@ public class AuthenticationToken implements OmhObject {
 		token = UUID.randomUUID().toString();
 		username = user.getUsername();
 		granted = System.currentTimeMillis();
-		expires = granted + AUTH_TOKEN_LIFETIME;
+		expires = granted + AUTH_TOKEN_LIFETIME_MS;
 	}
 
 	/**
