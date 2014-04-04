@@ -1,3 +1,18 @@
+/*******************************************************************************
+ * Copyright 2014 Open mHealth
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ ******************************************************************************/
 package org.openmhealth.reference.domain;
 
 import java.util.List;
@@ -16,6 +31,26 @@ import org.openmhealth.shim.ShimRegistry;
  * Reads data from shims or the database.
  */
 public class DataReader {
+    public static boolean canReadData(
+        final String schemaId,
+        final long version,
+        final String username) {
+        if (isSchemaIdKnown(schemaId, version)) {
+            String domain = Request.parseDomain(schemaId);
+
+            if (ShimRegistry.hasDomain(domain)) {
+				return (
+                    ExternalAuthorizationTokenBin
+                        .getInstance()
+                        .getToken(username, domain) != null);
+            } else {
+                return true;
+            }
+        } else {
+            return false;
+        }
+    }
+
     public static MultiValueResult<Data> readData(
         final String schemaId,
         final long version,
@@ -27,14 +62,9 @@ public class DataReader {
         final Long numToReturn) {
 		// Get the domain.
 		String domain = Request.parseDomain(schemaId);
-		
+
 		// Check to be sure the schema is known.
-		if(
-			(! ShimRegistry.hasDomain(domain)) &&
-			(Registry
-				.getInstance()
-				.getSchemas(schemaId, version, 0, 1).count() == 0)) {
-			
+        if (!isSchemaIdKnown(schemaId, version)) {
 			throw
 				new NoSuchSchemaException(
 					"The schema ID, '" +
@@ -42,7 +72,7 @@ public class DataReader {
 						"', and version, '" +
 						version +
 						"', pair is unknown.");
-		}
+        }
 		
 		// Get the data.
 		MultiValueResult<Data> result;
@@ -100,5 +130,17 @@ public class DataReader {
 		}
 
         return result;
+    }
+
+    private static boolean isSchemaIdKnown(
+        final String schemaId, 
+        final long version) {
+		String domain = Request.parseDomain(schemaId);
+
+        return (
+            ShimRegistry.hasDomain(domain)
+            || (Registry
+                .getInstance()
+                .getSchemas(schemaId, version, 0, 1).count() != 0));
     }
 }
