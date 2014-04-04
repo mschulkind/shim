@@ -85,7 +85,7 @@ public abstract class Request<T> {
 	 * @throws IllegalArgumentException
 	 *         The schema ID is not valid schema ID.
 	 */
-	public String parseDomain(final String schemaId)
+	public static String parseDomain(final String schemaId)
 		throws IllegalArgumentException {
 		
 		// Validate the input.

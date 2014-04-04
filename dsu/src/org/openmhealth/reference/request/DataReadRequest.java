@@ -27,6 +27,7 @@ import org.openmhealth.reference.domain.AuthenticationToken;
 import org.openmhealth.reference.domain.AuthorizationToken;
 import org.openmhealth.reference.domain.ColumnList;
 import org.openmhealth.reference.domain.Data;
+import org.openmhealth.reference.domain.DataReader;
 import org.openmhealth.reference.domain.ExternalAuthorizationToken;
 import org.openmhealth.reference.domain.MultiValueResult;
 import org.openmhealth.reference.domain.MultiValueResultAggregator;
@@ -247,80 +248,12 @@ public class DataReadRequest extends ListRequest<Data> {
 						"requested user's data.");
 		}
 
-		// Get the domain.
-		String domain = parseDomain(schemaId);
-
-		// Check to be sure the schema is known.
-		if(
-			(! ShimRegistry.hasDomain(domain)) &&
-			(Registry
-				.getInstance()
-				.getSchemas(schemaId, version, 0, 1).count() == 0)) {
-
-			throw
-				new NoSuchSchemaException(
-					"The schema ID, '" +
-						schemaId +
-						"', and version, '" +
-						version +
-						"', pair is unknown.");
-		}
-
-		// Get the data.
-		MultiValueResult<Data> result;
-		// Check if a shim should handle the request.
-		if(ShimRegistry.hasDomain(domain)) {
-			// Get the shim.
-			Shim shim = ShimRegistry.getShim(domain);
-
-			// Lookup the user's authorization code.
-			ExternalAuthorizationToken token =
-				ExternalAuthorizationTokenBin
-					.getInstance()
-					.getToken(username, domain);
-
-			// If the token does not exist, return an error. Clients should
-			// first check to be sure that the user has already authorized this
-			// domain.
-			if(token == null) {
-				throw
-					new OmhException(
-						"The user has not yet authorized this domain.");
-			}
-
-			// Get the data from the shim.
-			List<Data> resultList =
-				shim
-					.getData(
-						schemaId,
-						version,
-						token,
-						startDate,
-						endDate,
-						columnList,
-						getNumToSkip(),
-						getNumToReturn());
-
-			// Convert the List object into a MultiValueResult object.
-			result =
-				(new MultiValueResultAggregator<Data>(resultList)).build();
-		}
-		// Otherwise, handle the request ourselves.
-		else {
-			result =
-				DataSet
-					.getInstance()
-					.getData(
-						username,
-						schemaId,
-						version,
-						startDate,
-						endDate,
-						columnList,
-						getNumToSkip(),
-						getNumToReturn());
-		}
-
+        MultiValueResult<Data> result =
+            DataReader.readData(
+                schemaId, version, username, 
+                startDate, endDate, columnList,
+                getNumToSkip(), getNumToReturn());
+		
 		// Set the data.
 		setData(result);
 	}
