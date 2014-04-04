@@ -15,6 +15,8 @@
  ******************************************************************************/
 package org.openmhealth.reference.data;
 
+import java.util.List;
+
 import org.openmhealth.reference.domain.User;
 import org.openmhealth.reference.exception.OmhException;
 
@@ -106,4 +108,11 @@ public abstract class UserBin {
 	 *         There was an error updating the user.
 	 */
 	public abstract void updateUser(final User user) throws OmhException;
+
+    /**
+     * Retrieves all users.
+     *
+     * @return A list of all users.
+     */
+    public abstract List<? extends User> getUsers();
 }

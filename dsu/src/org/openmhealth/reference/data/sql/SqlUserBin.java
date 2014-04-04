@@ -2,6 +2,7 @@ package org.openmhealth.reference.data.sql;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 
 import org.openmhealth.reference.data.UserBin;
 import org.openmhealth.reference.domain.User;
@@ -368,4 +369,9 @@ public class SqlUserBin
 					"(" + User.JSON_KEY_REGISTRATION_KEY + ")" +
 			")";
 	}
+
+    @Override
+    public List<? extends User> getUsers() {
+        throw new UnsupportedOperationException();
+    }
 }

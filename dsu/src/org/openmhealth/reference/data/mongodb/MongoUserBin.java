@@ -15,6 +15,9 @@
  ******************************************************************************/
 package org.openmhealth.reference.data.mongodb;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.mongojack.DBCursor;
 import org.mongojack.DBQuery;
 import org.mongojack.DBQuery.Query;
@@ -253,4 +256,21 @@ public class MongoUserBin extends UserBin {
 			throw new OmhException("An internal error occurred.", e);
 		}
 	}
+
+    @Override
+    public List<? extends User> getUsers() {
+		// Get the user collection.
+		JacksonDBCollection<MongoUser, Object> collection =
+			JacksonDBCollection
+				.wrap(
+					MongoDao.getInstance()
+						.getDb()
+						.getCollection(DB_NAME),
+					MongoUser.class,
+					Object.class,
+					JSON_MAPPER);
+		
+        // Fetch all the user.
+		return collection.find().toArray();
+    }
 }
