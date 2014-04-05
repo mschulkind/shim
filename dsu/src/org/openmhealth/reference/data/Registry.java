@@ -128,4 +128,6 @@ public abstract class Registry {
 		final Long schemaVersion,
 		final long numToSkip,
 		final long numToReturn);
+
+    public abstract void createSchema(final Schema schema);
 }

@@ -520,4 +520,9 @@ public class SqlRegistry
 						") " +
 				")";
 	}
+
+    @Override
+    public void createSchema(final Schema schema) {
+        throw new UnsupportedOperationException();
+    }
 }

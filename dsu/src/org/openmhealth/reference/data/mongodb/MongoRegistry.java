@@ -30,9 +30,11 @@ import org.openmhealth.reference.concordia.OmhValidationController;
 import org.openmhealth.reference.data.Registry;
 import org.openmhealth.reference.domain.MultiValueResult;
 import org.openmhealth.reference.domain.Schema;
+import org.openmhealth.reference.domain.User;
 import org.openmhealth.reference.domain.mongodb.MongoMultiValueResultCursor;
 import org.openmhealth.reference.domain.mongodb.MongoMultiValueResultList;
 import org.openmhealth.reference.domain.mongodb.MongoSchema;
+import org.openmhealth.reference.exception.OmhException;
 
 import com.fasterxml.jackson.databind.InjectableValues;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -40,6 +42,7 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
+import com.mongodb.MongoException;
 import com.mongodb.QueryBuilder;
 
 /**
@@ -299,4 +302,35 @@ public class MongoRegistry extends Registry {
 					.skip((new Long(numToSkip)).intValue())
 					.limit((new Long(numToReturn)).intValue()));
 	}
+
+    @Override
+    public void createSchema(final Schema schema) {
+		// Validate the input.
+		if(schema == null) {
+			throw new OmhException("The schema is null.");
+		}
+		
+		// Get the user collection.
+		JacksonDBCollection<Schema, Object> collection =
+			JacksonDBCollection
+				.wrap(
+					MongoDao.getInstance()
+						.getDb()
+						.getCollection(DB_NAME),
+					Schema.class,
+					Object.class,
+					JSON_MAPPER);
+		
+		// Save the user.
+		try {
+			collection.insert(schema);
+		}
+		catch(MongoException.DuplicateKey e) {
+			throw
+				new OmhException(
+					"A schema with the given ID and version combination"
+                    + " already exists",
+					e);
+		}
+    }
 }
