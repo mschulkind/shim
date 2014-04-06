@@ -21,7 +21,7 @@ import org.joda.time.format.ISODateTimeFormat;
 import org.openmhealth.reference.exception.OmhException;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-public class ManualRunner extends Runner {
+public class ManualRunner {
     public static void main(String[] args) {
         if (args.length != 2) {
             throw new RuntimeException(
@@ -44,7 +44,7 @@ public class ManualRunner extends Runner {
                 "/config/spring/payload.xml", ManualRunner.class);
 
         try {
-            run(startDate, endDate);
+            Runner.run(startDate, endDate);
         } finally {
             context.close();
         }
