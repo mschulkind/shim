@@ -64,6 +64,10 @@ public class Dpu {
         this.version = version;
     }
 
+    public String getId() { return id; }
+    public String getBaseUrl() { return baseUrl; }
+    public long getVersion() { return version; }
+
     public Schema getSchema() {
         if (schema == null) {
             URL url = buildUrl(null, null, null);
@@ -243,7 +247,7 @@ public class Dpu {
         final DateTime startDate,
         final DateTime endDate) {
         StringBuilder urlBuilder = 
-            new StringBuilder(baseUrl + "/" + id + "/" + version);
+            new StringBuilder(baseUrl + "/omh/v1/" + id + "/" + version);
 
         if (endpoint != null) {
             urlBuilder.append("/" + endpoint);
