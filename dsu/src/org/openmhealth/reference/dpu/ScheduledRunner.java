@@ -29,15 +29,18 @@ public class ScheduledRunner {
 
     @Scheduled(cron="0 0 4 * * *")
     public void run() {
+        // Run all DPUs from the beginning of yesterday until 1 second before
+        // the beginning of today.
         DateTime startOfToday = (new DateTime()).withTimeAtStartOfDay();
         DateTime startOfYesterday = startOfToday.plusDays(-1);
+        DateTime endOfPeriod = startOfToday.plusSeconds(-1);
 
         String period =
             "all DPUs for the period of " + startOfYesterday.toString() 
-            + " until " + startOfToday.toString() + ".";
+            + " until " + endOfPeriod.toString() + ".";
 
         LOGGER.log(Level.INFO, "About to run " + period);
-        Runner.run(startOfYesterday, startOfToday);
+        Runner.run(startOfYesterday, endOfPeriod);
         LOGGER.log(Level.INFO, "Ran " + period);
     }
 }
