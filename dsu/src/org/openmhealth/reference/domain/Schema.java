@@ -48,7 +48,7 @@ public class Schema implements OmhObject {
 	 * The pattern to use for validating schema IDs.
 	 */
 	private static final Pattern PATTERN_ID =
-		Pattern.compile("omh(:[a-zA-Z0-9_]+)+");
+		Pattern.compile("omh(:[a-zA-Z0-9_-]+)+");
 
 	/**
 	 * The JSON key for the ID of a schema.
