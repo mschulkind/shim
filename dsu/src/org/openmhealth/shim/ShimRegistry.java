@@ -1,7 +1,9 @@
 package org.openmhealth.shim;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -97,6 +99,25 @@ public abstract class ShimRegistry {
 		// Return the Shim object
 		return result;
 	}
+
+    /**
+     * Returns the list of domains for the given standard measure.
+     */
+    public static List<String> getDomainsForStandardMeasure(
+        final String schemaId,
+        final Long version) {
+        List<String> domains = new ArrayList<String>();
+
+        for (String key : REGISTRY.keySet()) {
+            Shim shim = REGISTRY.get(key);
+            if (shim.getSchemaIds().contains(schemaId)
+                && shim.getSchemaVersions(schemaId).contains(version)) {
+                domains.add(shim.getDomain());
+            }
+        }
+
+        return domains;
+    }
 	
 	/**
 	 * Adds a new {@link Shim} to the registry.

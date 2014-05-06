@@ -67,6 +67,7 @@ import org.openmhealth.reference.request.Request;
 import org.openmhealth.reference.request.SchemaIdsRequest;
 import org.openmhealth.reference.request.SchemaRequest;
 import org.openmhealth.reference.request.SchemaVersionsRequest;
+import org.openmhealth.reference.request.StandardMeasureSourcesRequest;
 import org.openmhealth.reference.request.UserActivationRequest;
 import org.openmhealth.reference.request.UserAuthorizedDomainRequest;
 import org.openmhealth.reference.request.UserRegistrationRequest;
@@ -1344,6 +1345,51 @@ public class Version1 {
 				request,
 				response,
 				new SchemaVersionsRequest(schemaId, numToSkip, numToReturn));
+	}
+
+	/**
+     * Creates a request to get the this of domains that can provide data for
+     * the given standard measure schema ID.
+     *
+	 * @param schemaId
+	 *        The schema ID from the URL.
+	 *
+	 * @param version
+	 *        The schema version from the URL.
+	 *
+	 * @param response
+	 *        The HTTP response object.
+	 *
+	 * @return The schema for the given schema ID-version pair.
+	 */
+	@RequestMapping(
+		value =
+			"{" + PARAM_SCHEMA_ID + "}/" +
+			"{" + PARAM_SCHEMA_VERSION + ":[\\d]" + "}" +
+            "/sources",
+		method = RequestMethod.GET)
+	public @ResponseBody Object getStandardMeasureSources(
+		@PathVariable(PARAM_SCHEMA_ID) final String schemaId,
+		@PathVariable(PARAM_SCHEMA_VERSION) final Long version,
+		final HttpServletRequest request,
+		@RequestParam(
+			value = PARAM_PAGING_NUM_TO_SKIP,
+			required = false,
+			defaultValue = ListRequest.DEFAULT_NUMBER_TO_SKIP_STRING)
+			final long numToSkip,
+		@RequestParam(
+			value = PARAM_PAGING_NUM_TO_RETURN,
+			required = false,
+			defaultValue = ListRequest.DEFAULT_NUMBER_TO_RETURN_STRING)
+			final long numToReturn,
+		final HttpServletResponse response) {
+
+		return
+			handleRequest(
+				request,
+				response,
+				new StandardMeasureSourcesRequest(
+                    schemaId, version, numToSkip, numToReturn));
 	}
 
 	/**
