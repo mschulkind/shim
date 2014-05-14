@@ -2,10 +2,11 @@ package org.openmhealth.reference.request;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.openmhealth.reference.data.Registry;
 import org.openmhealth.reference.domain.MultiValueResult;
@@ -52,67 +53,39 @@ public class SchemaIdsRequest extends ListRequest<String> {
 			setServiced();
 		}
 
-		// Get the number of records to skip and the number to return and store
-		// them as we will need to temporarily modify them.
-		long currNumToSkip = getNumToSkip();
-		long currNumToReturn = getNumToReturn();
-		long totalSchemasNeeded = currNumToSkip + currNumToReturn;
-
-		// Get the set of known domains and convert it into a list for sorting.
-		List<String> domains =
-			new ArrayList<String>(ShimRegistry.getDomains());
-		Collections.sort(domains);
+        Set<String> schemaIds = new HashSet<String>();
 
 		// For each domain, get the list of known schema IDs.
+		List<String> domains =
+			new ArrayList<String>(ShimRegistry.getDomains());
 		Iterator<String> domainIterator = domains.iterator();
-		List<String> externalSchemaIds = new LinkedList<String>();
-		while(
-			domainIterator.hasNext() &&
-			(externalSchemaIds.size() < totalSchemasNeeded)) {
-
+		while(domainIterator.hasNext()) {
 			Shim shim = ShimRegistry.getShim(domainIterator.next());
-			externalSchemaIds.addAll(shim.getSchemaIds());
+			schemaIds.addAll(shim.getSchemaIds());
 		}
-
-		// Save the number of external schema IDs.
-		int numExternalSchemaIds = externalSchemaIds.size();
-
-		// Remove the schema IDs that should be skipped and limit it by the
-		// number that should be returned.
-		externalSchemaIds =
-			externalSchemaIds
-				.subList(
-					(int) currNumToSkip,
-					(int)
-						Math.min(
-							externalSchemaIds.size(),
-							totalSchemasNeeded));
-
-		// Compute the number of local schema IDs to skip and return.
-		if(numExternalSchemaIds >= totalSchemasNeeded) {
-			currNumToSkip = 0;
-			currNumToReturn = 0;
-		}
-		else if(numExternalSchemaIds <= currNumToSkip) {
-			currNumToSkip -= numExternalSchemaIds;
-		}
-		else {
-			long overflow = numExternalSchemaIds - currNumToSkip;
-			currNumToSkip = 0;
-			currNumToReturn -= overflow;
-		}
-
+		
 		// Get the schema IDs.
 		MultiValueResult<String> internalSchemaIds =
-			Registry
-				.getInstance().getSchemaIds(currNumToSkip, currNumToReturn);
+			Registry.getInstance().getSchemaIds(0, Long.MAX_VALUE);
+        Iterator<String> externalIdIterator = internalSchemaIds.iterator();
+        while(externalIdIterator.hasNext()) {
+            schemaIds.add(externalIdIterator.next());
+        }
 
-		// Aggregate the two lists.
-		MultiValueResult<String> result =
-			(new MultiValueResultAggregator<String>(externalSchemaIds))
-			.add(internalSchemaIds)
-			.build();
+        List<String> schemaIdsList = new ArrayList<String>();
+        schemaIdsList.addAll(schemaIds);
+		Collections.sort(schemaIdsList);
+        int lowerBound = Math.max((int)getNumToSkip(), 0);
+        int upperBound =
+            Math.min(
+                (int)(getNumToSkip() + getNumToReturn()), 
+                schemaIdsList.size());
+        schemaIdsList = 
+            schemaIdsList.subList(lowerBound, upperBound);
 
+        MultiValueResult<String> result =
+            (new MultiValueResultAggregator<String>(schemaIdsList)).build();
+		
 		// Set the data.
 		setData(result);
 	}
