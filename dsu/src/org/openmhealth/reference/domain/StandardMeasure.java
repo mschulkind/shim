@@ -1,7 +1,7 @@
 package org.openmhealth.reference.domain;
 
 public class StandardMeasure {
-    public static final String DOMAIN = "standard";
+    public static final String DOMAIN = "omh";
     public static final String SCHEMA_PREFIX = "omh:" + DOMAIN + ":";
 
     public static final String JSON_KEY_EFFECTIVE_TIMEFRAME = 
