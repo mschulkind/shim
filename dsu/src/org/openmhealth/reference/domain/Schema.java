@@ -368,14 +368,19 @@ public class Schema implements OmhObject {
         InputStream schemaStream =
             Schema.class.getClassLoader()
                 .getResourceAsStream(schemaResourcePath);
-        Concordia concordia = null;
-        try {
-            concordia = new Concordia(schemaStream);
+
+        if (schemaStream != null) {
+            Concordia concordia = null;
+            try {
+                concordia = new Concordia(schemaStream);
+            }
+            catch(Exception e) {
+                throw new OmhException("Error reading schema.", e);
+            }
+                    
+            return new Schema(id, version.longValue(), concordia);
+        } else {
+            return null;
         }
-        catch(Exception e) {
-            throw new OmhException("Error reading schema.", e);
-        }
-                
-        return new Schema(id, version.longValue(), concordia);
     }
 }

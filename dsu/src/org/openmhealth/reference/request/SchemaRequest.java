@@ -104,11 +104,14 @@ public class SchemaRequest extends Request<Concordia> {
 			
 			// Use the shim to build the schema.
 			schema = shim.getSchema(schemaId, schemaVersion);
-		}
-		// Otherwise, check our internal registry.
-		else {
-			schema =
-				Registry.getInstance().getSchema(schemaId, schemaVersion);
+		} 
+        // Try to load the schema from a file.
+        else if (
+            (schema = Schema.loadFromFile(schemaId, schemaVersion)) != null) {
+        } 
+        // Otherwise, check our internal registry.
+        else {
+            schema = Registry.getInstance().getSchema(schemaId, schemaVersion);
 		}
 		
 		// Make sure the schema exists.

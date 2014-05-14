@@ -225,6 +225,10 @@
                 <exclude name="META-INF/**" />
                 <exclude name="WEB-INF/**" />
             </zipfileset>
+            <zipfileset 
+                    prefix="WEB-INF/classes" 
+                    dir=""
+                    includes="schema/**/*.json"/>
         </war>
     </target>
     
