@@ -15,6 +15,7 @@
  ******************************************************************************/
 package org.openmhealth.reference.domain;
 
+import java.io.InputStream;
 import java.util.regex.Pattern;
 
 import name.jenkins.paul.john.concordia.Concordia;
@@ -22,6 +23,7 @@ import name.jenkins.paul.john.concordia.exception.ConcordiaException;
 import name.jenkins.paul.john.concordia.validator.ValidationController;
 
 import org.openmhealth.reference.exception.OmhException;
+import org.openmhealth.shim.exception.ShimSchemaException;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -286,4 +288,94 @@ public class Schema implements OmhObject {
 
 		return chunkSize;
 	}
+
+    /**
+     * Splits a schema ID into an array of strings.
+     */
+    private static String[] splitSchemaId(final String id) {
+        if (id == null) {
+            throw new OmhException("id is null");
+        }
+
+        String[] parts = id.split(":");
+
+        if (parts.length != 3) {
+            throw new OmhException("Invalid schema id: " + id);
+        }
+
+        return parts;
+    }
+
+    /**
+     * Given a schema ID, returns the data type. For example, given
+     * 'omh:fitbit:activity', will return 'activity'.
+     *
+     * @param id
+     *        The schema ID.
+     *
+     * @return The data type.
+     */
+    public static String dataTypeFromSchemaId(final String id) {
+        return splitSchemaId(id)[2];
+    }
+
+    /**
+     * Given a schema ID, returns the domain. For example, given
+     * 'omh:fitbit:activity', will return 'fitbit'.
+     *
+     * @param id
+     *        The schema ID.
+     *
+     * @return The domain.
+     */
+    public static String domainFromSchemaId(final String id) {
+        return splitSchemaId(id)[1];
+    }
+
+    /**
+     * Loads a Schema object for a schema ID. Schemas are read from JSON
+     * files found on the classpath. For example, the schema for version 1 of
+     * 'omh:fitbit:activity' would be found in a file called
+     * 'schema/fitbit/1/activity.json'.
+     *
+	 * @param id
+	 *        The schema ID.
+	 * 
+	 * @param version
+	 *        The schema version.
+	 * 
+	 * @return The schema for the given schema-ID version pair or null if the
+	 *         pair is unknown.
+	 * 
+	 * @throws ShimSchemaException
+	 *         The ID and/or version are null.
+     */
+    public static Schema loadFromFile(
+        final String id,
+        final Long version) {
+        if (id == null) {
+            throw new OmhException("The given schema ID is null.");
+        }
+        if (version == null) {
+            throw new OmhException("The given schema version is null.");
+        }
+
+        String schemaResourcePath =
+            "schema/" + domainFromSchemaId(id) + "/" + version + "/"
+            + dataTypeFromSchemaId(id) + ".json";
+
+        // Load and parse the schema from the schema file.
+        InputStream schemaStream =
+            Schema.class.getClassLoader()
+                .getResourceAsStream(schemaResourcePath);
+        Concordia concordia = null;
+        try {
+            concordia = new Concordia(schemaStream);
+        }
+        catch(Exception e) {
+            throw new OmhException("Error reading schema.", e);
+        }
+                
+        return new Schema(id, version.longValue(), concordia);
+    }
 }
