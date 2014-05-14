@@ -55,16 +55,9 @@ public class SchemaIdsRequest extends ListRequest<String> {
 
         Set<String> schemaIds = new HashSet<String>();
 
-		// For each domain, get the list of known schema IDs.
-		List<String> domains =
-			new ArrayList<String>(ShimRegistry.getDomains());
-		Iterator<String> domainIterator = domains.iterator();
-		while(domainIterator.hasNext()) {
-			Shim shim = ShimRegistry.getShim(domainIterator.next());
-			schemaIds.addAll(shim.getSchemaIds());
-		}
+        schemaIds.addAll(ShimRegistry.getAllSchemaIds());
 		
-		// Get the schema IDs.
+		// Get all internal schema IDs.
 		MultiValueResult<String> internalSchemaIds =
 			Registry.getInstance().getSchemaIds(0, Long.MAX_VALUE);
         Iterator<String> externalIdIterator = internalSchemaIds.iterator();
@@ -72,6 +65,7 @@ public class SchemaIdsRequest extends ListRequest<String> {
             schemaIds.add(externalIdIterator.next());
         }
 
+        // Sort, dedupe, and set the result.
         List<String> schemaIdsList = new ArrayList<String>();
         schemaIdsList.addAll(schemaIds);
 		Collections.sort(schemaIdsList);

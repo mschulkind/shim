@@ -3,6 +3,7 @@ package org.openmhealth.shim;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -117,6 +118,21 @@ public abstract class ShimRegistry {
         }
 
         return domains;
+    }
+
+    /**
+     * Returns a list of all schema IDs supported by registered shims.
+     */
+    public static List<String> getAllSchemaIds() {
+        Set<String> set = new HashSet<String>();
+
+        for (Shim shim : REGISTRY.values()) {
+            set.addAll(shim.getSchemaIds());
+        }
+
+        List<String> list = new ArrayList<String>();
+        list.addAll(set);
+        return list;
     }
 	
 	/**
