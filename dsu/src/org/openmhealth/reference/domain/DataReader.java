@@ -77,24 +77,54 @@ public class DataReader {
 		// Get the data.
 		MultiValueResult<Data> result;
 		// Check if a shim should handle the request.
-		if(ShimRegistry.hasDomain(domain)) {
+		if(ShimRegistry.getAllSchemaIds().contains(schemaId)) {
+            String sourceDomain = null;
+            ExternalAuthorizationToken token = null;
+
+            if (domain.equals(StandardMeasure.DOMAIN)) {
+                List<String> sourceDomains = 
+                    ShimRegistry.getDomainsForStandardMeasure(
+                        schemaId, version);
+
+                // Find an authorized domain from the source domains.
+                for (String d : sourceDomains) {
+                    sourceDomain = d;
+                    token =
+                        ExternalAuthorizationTokenBin
+                        .getInstance()
+                        .getToken(username, d);
+
+                    if (token != null) {
+                        break;
+                    }
+                }
+
+                if (token == null) {
+                    throw
+                        new OmhException(
+                            "No authorized source domains found for measure.");
+                }
+            } else {
+                sourceDomain = domain;
+
+                // Lookup the user's authorization code.
+                token =
+                    ExternalAuthorizationTokenBin
+                    .getInstance()
+                    .getToken(username, domain);
+
+                // If the token does not exist, return an error. Clients should
+                // first check to be sure that the user has already authorized
+                // this domain.
+                if(token == null) {
+                    throw
+                        new OmhException(
+                            "The user has not yet authorized this domain.");
+                }
+            }
+
 			// Get the shim.
-			Shim shim = ShimRegistry.getShim(domain);
-			
-			// Lookup the user's authorization code.
-			ExternalAuthorizationToken token =
-				ExternalAuthorizationTokenBin
-					.getInstance()
-					.getToken(username, domain);
-			
-			// If the token does not exist, return an error. Clients should
-			// first check to be sure that the user has already authorized this
-			// domain.
-			if(token == null) {
-				throw
-					new OmhException(
-						"The user has not yet authorized this domain.");
-			}
+			Shim shim = ShimRegistry.getShim(sourceDomain);
 			
 			// Get the data from the shim.
 			List<Data> resultList =
@@ -112,9 +142,8 @@ public class DataReader {
 			// Convert the List object into a MultiValueResult object.
 			result =
 				(new MultiValueResultAggregator<Data>(resultList)).build();
-		}
-		// Otherwise, handle the request ourselves.
-		else {
+        } else {
+            // Otherwise, handle the request ourselves.
 			result =
 				DataSet
 					.getInstance()
@@ -135,10 +164,8 @@ public class DataReader {
     private static boolean isSchemaIdKnown(
         final String schemaId, 
         final long version) {
-		String domain = Request.parseDomain(schemaId);
-
         return (
-            ShimRegistry.hasDomain(domain)
+            ShimRegistry.getAllSchemaIds().contains(schemaId)
             || (Registry
                 .getInstance()
                 .getSchemas(schemaId, version, 0, 1).count() != 0));
