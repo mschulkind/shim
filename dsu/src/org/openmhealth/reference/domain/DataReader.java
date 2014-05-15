@@ -38,7 +38,11 @@ public class DataReader {
         if (isSchemaIdKnown(schemaId, version)) {
             String domain = Request.parseDomain(schemaId);
 
-            if (ShimRegistry.hasDomain(domain)) {
+            if (domain.equals(StandardMeasure.DOMAIN)) {
+                return getAuthorizedSourceDomainForStandardMeasure(
+                    schemaId, version, username) != null;
+            }
+            else if (ShimRegistry.hasDomain(domain)) {
 				return (
                     ExternalAuthorizationTokenBin
                         .getInstance()
@@ -82,28 +86,20 @@ public class DataReader {
             ExternalAuthorizationToken token = null;
 
             if (domain.equals(StandardMeasure.DOMAIN)) {
-                List<String> sourceDomains = 
-                    ShimRegistry.getDomainsForStandardMeasure(
-                        schemaId, version);
+                sourceDomain = 
+                    getAuthorizedSourceDomainForStandardMeasure(
+                        schemaId, version, username);
 
-                // Find an authorized domain from the source domains.
-                for (String d : sourceDomains) {
-                    sourceDomain = d;
-                    token =
-                        ExternalAuthorizationTokenBin
-                        .getInstance()
-                        .getToken(username, d);
-
-                    if (token != null) {
-                        break;
-                    }
-                }
-
-                if (token == null) {
+                if (sourceDomain == null) {
                     throw
                         new OmhException(
                             "No authorized source domains found for measure.");
                 }
+
+                token =
+                    ExternalAuthorizationTokenBin
+                    .getInstance()
+                    .getToken(username, sourceDomain);
             } else {
                 sourceDomain = domain;
 
@@ -169,5 +165,28 @@ public class DataReader {
             || (Registry
                 .getInstance()
                 .getSchemas(schemaId, version, 0, 1).count() != 0));
+    }
+
+    private static String getAuthorizedSourceDomainForStandardMeasure(
+        final String schemaId,
+        final long version,
+        final String username) {
+        List<String> sourceDomains = 
+            ShimRegistry.getDomainsForStandardMeasure(
+                schemaId, version);
+
+        // Find an authorized domain from the source domains.
+        for (String domain : sourceDomains) {
+            ExternalAuthorizationToken token =
+                ExternalAuthorizationTokenBin
+                .getInstance()
+                .getToken(username, domain);
+
+            if (token != null) {
+                return domain;
+            }
+        }
+
+        return null;
     }
 }
