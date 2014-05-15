@@ -110,4 +110,14 @@ public abstract class DataSet {
 		final ColumnList columnList,
 		final long numToSkip,
 		final long numToReturn);
+
+    /**
+     * Delete the data for a schema/version/owner over a time period.
+     */
+    public abstract void deleteData(
+		final String owner,
+		final String schemaId,
+		final long version,
+		final DateTime startDate,
+		final DateTime endDate);
 }

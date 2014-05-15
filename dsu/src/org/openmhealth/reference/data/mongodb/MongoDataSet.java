@@ -152,7 +152,7 @@ public class MongoDataSet extends DataSet {
 					Data.JSON_KEY_METADATA +
 						"." +
 						MetaData.JSON_KEY_TIMESTAMP)
-				.greaterThan(endDate.toString());
+				.lessThan(endDate.toString());
 		}
 		
 		// Create the projection.
@@ -202,4 +202,54 @@ public class MongoDataSet extends DataSet {
 					.skip((new Long(numToSkip)).intValue())
 					.limit((new Long(numToReturn)).intValue()));
 	}
+
+    @Override
+    public void deleteData(
+		final String owner,
+		final String schemaId,
+		final long version,
+		final DateTime startDate,
+		final DateTime endDate) {
+		// Get the connection to the database.
+		DB db = MongoDao.getInstance().getDb();
+		
+		// Get the connection to the data with the Jackson wrapper.
+		JacksonDBCollection<MongoData, Object> collection =
+			JacksonDBCollection
+				.wrap(db.getCollection(DB_NAME), MongoData.class);
+		
+		// Build the query.
+		QueryBuilder queryBuilder = QueryBuilder.start();
+		
+		// Only select data for a single user.
+		queryBuilder.and(Data.JSON_KEY_OWNER).is(owner);
+		
+		// Only select data for a given schema.
+		queryBuilder.and(Schema.JSON_KEY_ID).is(schemaId);
+		
+		// Only select data for a given version of the the given schema.
+		queryBuilder.and(Schema.JSON_KEY_VERSION).is(version);
+		
+		// Only select data on or after the start date.
+		if(startDate != null) {
+			queryBuilder
+				.and(
+					Data.JSON_KEY_METADATA +
+						"." +
+						MetaData.JSON_KEY_TIMESTAMP)
+				.greaterThan(startDate.toString());
+		}
+		
+		// Only select data on or before the end date.
+		if(endDate != null) {
+			queryBuilder
+				.and(
+					Data.JSON_KEY_METADATA +
+						"." +
+						MetaData.JSON_KEY_TIMESTAMP)
+				.lessThan(endDate.toString());
+		}
+
+        collection.remove(queryBuilder.get());
+    }
 }

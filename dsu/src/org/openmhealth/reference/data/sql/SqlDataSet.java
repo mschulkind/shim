@@ -491,6 +491,16 @@ public class SqlDataSet extends DataSet implements SqlDaoInterface {
 								"ON DELETE CASCADE" +
 				")";
 	}
+
+    @Override
+    public void deleteData(
+		final String owner,
+		final String schemaId,
+		final long version,
+		final DateTime startDate,
+		final DateTime endDate) {
+        throw new UnsupportedOperationException();
+    }
 	
 	/**
 	 * Applies a column list onto a data element.
