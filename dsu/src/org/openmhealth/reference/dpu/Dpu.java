@@ -34,6 +34,7 @@ import org.openmhealth.reference.data.UserBin;
 import org.openmhealth.reference.domain.Data;
 import org.openmhealth.reference.domain.DataReader;
 import org.openmhealth.reference.domain.MultiValueResult;
+import org.openmhealth.reference.domain.MultiValueResultAggregator;
 import org.openmhealth.reference.domain.Schema;
 import org.openmhealth.reference.domain.User;
 import org.openmhealth.reference.exception.OmhException;
@@ -161,26 +162,33 @@ public class Dpu {
             }
             
             // Grab the minimum num to return.
-            JsonNode minNumToReturnJson = requirement.get("min_num_to_return");
-            long minNumToReturn = 0;
-            if (minNumToReturnJson != null 
-                && minNumToReturnJson.isIntegralNumber()) {
-                minNumToReturn = minNumToReturnJson.asLong();
+            JsonNode includeOnePreviousJson = 
+                requirement.get("include_one_previous");
+            Boolean includeOnePrevious = false;
+            if (includeOnePreviousJson != null 
+                && includeOnePreviousJson.isBoolean()) {
+                includeOnePrevious = includeOnePreviousJson.asBoolean();
             }
 
-            MultiValueResult<Data> data = DataReader.readData(
-                schemaId, version, username, start, end, null,
-                new Long(0), 
-                new Long(numToReturn));
+			MultiValueResultAggregator<Data> result = 
+                new MultiValueResultAggregator<Data>();
 
-            // Make sure we got at least the minimum number of data points.
-            if (data.size() < minNumToReturn) {
-                data = DataReader.readData(
-                    schemaId, version, username, null, end, null,
-                    new Long(0), new Long(minNumToReturn));
+            // Add a previous point if needed.
+            if (includeOnePrevious) {
+                result.add(
+                    DataReader.readData(
+                        schemaId, version, username, null, start, null,
+                        new Long(0), 
+                        new Long(1)));
             }
 
-            dataMap.put(schemaId, data);
+            result.add(
+                DataReader.readData(
+                    schemaId, version, username, start, end, null,
+                    new Long(0), 
+                    new Long(numToReturn)));
+
+            dataMap.put(schemaId, result.build());
         }
 
         return dataMap;
