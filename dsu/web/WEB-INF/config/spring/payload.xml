@@ -52,6 +52,36 @@
         init-method="init" 
         destroy-method="destroy"/>
 
+    <bean
+        id="fatSecretShim"
+        class="org.openmhealth.shim.FatSecretShimRegistry"
+        init-method="init"/>
+
+    <bean
+        id="fitbitShim"
+        class="org.openmhealth.shim.fitbit.FitbitShimRegistry"
+        init-method="init"/>
+
+    <bean
+        id="movesShim"
+        class="org.openmhealth.shim.MovesShimRegistry"
+        init-method="init"/>
+
+    <bean
+        id="runkeeperShim"
+        class="org.openmhealth.shim.RunkeeperShimRegistry"
+        init-method="init"/>
+
+    <bean
+        id="twoNetShim"
+        class="org.openmhealth.shim.twonet.TwoNetShimRegistry"
+        init-method="init"/>
+
+    <bean
+        id="withingsShim"
+        class="org.openmhealth.shim.withings.WithingsShimRegistry"
+        init-method="init"/>
+
     <!-- Use annotations. -->
     <mvc:annotation-driven>
         <mvc:message-converters>
