@@ -1,12 +1,16 @@
 package org.openmhealth.reference.request;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.openmhealth.reference.data.Registry;
 import org.openmhealth.reference.domain.MultiValueResult;
 import org.openmhealth.reference.domain.MultiValueResultAggregator;
+import org.openmhealth.reference.domain.StandardMeasure;
 import org.openmhealth.reference.exception.OmhException;
 import org.openmhealth.shim.Shim;
 import org.openmhealth.shim.ShimRegistry;
@@ -77,8 +81,28 @@ public class SchemaVersionsRequest extends ListRequest<Long> {
 
 		// Get the schema versions.
 		MultiValueResult<Long> result;
+        if (domain.equals(StandardMeasure.DOMAIN)) {
+            // Generate a set of all versions of this schema supported by any
+            // shim.
+            Set<Long> versionsSet = new HashSet<Long>();
+            List<String> shimDomains =
+                new ArrayList<String>(ShimRegistry.getDomains());
+            for (String shimDomain : shimDomains) {
+                Shim shim = ShimRegistry.getShim(shimDomain);
+                if (shim.getSchemaIds().indexOf(schemaId) != -1) {
+                    versionsSet.addAll(shim.getSchemaVersions(schemaId));
+                }
+            }
+
+            // Turn the set into a sorted list and set the result.
+            List<Long> versionsList = new ArrayList<Long>();
+            versionsList.addAll(versionsSet);
+            Collections.sort(versionsList);
+			result = 
+                (new MultiValueResultAggregator<Long>(versionsList)).build();
+        }
 		// If it can be handled by a shim, use that.
-		if(ShimRegistry.hasDomain(domain)) {
+        else if(ShimRegistry.hasDomain(domain)) {
 			// Get the shim.
 			Shim shim = ShimRegistry.getShim(domain);
 
