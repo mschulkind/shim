@@ -97,6 +97,11 @@ public class Dpu {
             // Run read->transform->write cycle for each user that can fulfill
             // the DPU requirements.
             if (canReadAllRequirements(user.getUsername(), requirements)) {
+                // First delete any existing output data so we don't get
+                // duplicates from repeat runs.
+                DataSet.getInstance().deleteData(
+                    user.getUsername(), id, version, startDate, endDate);
+                
                 Map<String, MultiValueResult<Data>> inputData = 
                     readInputData(user.getUsername(), requirements);
                 List<Data> outputData = 
