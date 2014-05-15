@@ -173,6 +173,12 @@ public class Dpu {
 			MultiValueResultAggregator<Data> result = 
                 new MultiValueResultAggregator<Data>();
 
+            result.add(
+                DataReader.readData(
+                    schemaId, version, username, start, end, null,
+                    new Long(0), 
+                    new Long(numToReturn)));
+
             // Add a previous point if needed.
             if (includeOnePrevious) {
                 result.add(
@@ -181,12 +187,6 @@ public class Dpu {
                         new Long(0), 
                         new Long(1)));
             }
-
-            result.add(
-                DataReader.readData(
-                    schemaId, version, username, start, end, null,
-                    new Long(0), 
-                    new Long(numToReturn)));
 
             dataMap.put(schemaId, result.build());
         }
