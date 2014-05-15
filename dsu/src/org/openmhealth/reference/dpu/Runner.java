@@ -104,6 +104,7 @@ public class Runner {
                     Level.WARNING, 
                     "Error running DPU '" + dpu.getId() + "/"
                     + dpu.getVersion() + "', skipping.");
+                LOGGER.log(Level.WARNING, "Exception: ", e);
             }
         }
     }
