@@ -50,12 +50,16 @@ public class Dpu {
     private final String id;
     private final String baseUrl;
     private final long version;
+    private final Map<String, String> params;
+    private final String outputSchemaId;
     private Schema schema;
     
     public Dpu(
         final String id,
         final String baseUrl,
-        final long version) {
+        final long version,
+        final Map<String, String> params,
+        final String outputSchemaId) {
         if (id == null || baseUrl == null) {
             throw new OmhException("A required parameter is missing");
         }
@@ -63,11 +67,19 @@ public class Dpu {
         this.id = id;
         this.baseUrl = baseUrl;
         this.version = version;
+        this.params = params;
+
+        if (outputSchemaId != null) {
+            this.outputSchemaId = outputSchemaId;
+        } else {
+            this.outputSchemaId = id;
+        }
     }
 
     public String getId() { return id; }
     public String getBaseUrl() { return baseUrl; }
     public long getVersion() { return version; }
+    public Map<String, String> getParams() { return params; }
 
     public Schema getSchema() {
         if (schema == null) {
@@ -79,8 +91,8 @@ public class Dpu {
             catch(Exception e) {
                 throw new OmhException("Error fetching schema.", e);
             }
-                    
-            schema = new Schema(id, version, concordia);
+
+            schema = new Schema(outputSchemaId, version, concordia);
         }
 
         return schema;
@@ -101,7 +113,8 @@ public class Dpu {
                 // First delete any existing output data so we don't get
                 // duplicates from repeat runs.
                 DataSet.getInstance().deleteData(
-                    user.getUsername(), id, version, startDate, endDate);
+                    user.getUsername(), outputSchemaId, version, 
+                    startDate, endDate);
                 
                 Map<String, MultiValueResult<Data>> inputData = 
                     readInputData(user.getUsername(), requirements);
@@ -266,10 +279,23 @@ public class Dpu {
             urlBuilder.append("/" + endpoint);
         }
 
+        String beforeAdditionalParams = "?";
         if (startDate != null && endDate != null) {
             urlBuilder.append(
                 "?t_start=" + startDate.toString()
                 + "&t_end=" + endDate.toString());
+            beforeAdditionalParams = "&";
+        }
+
+        if (params.size() > 0) {
+            for (String key : params.keySet()) {
+                urlBuilder.append(
+                    beforeAdditionalParams 
+                    + key
+                    + "="
+                    + params.get(key));
+                beforeAdditionalParams = "&";
+            }
         }
 
         URL url = null;
@@ -316,7 +342,7 @@ public class Dpu {
 
     private void ensureOutputSchemaExists() {
         Registry registry = Registry.getInstance();
-        if (registry.getSchema(id, version) == null) {
+        if (registry.getSchema(outputSchemaId, version) == null) {
             registry.createSchema(getSchema());
         }
     }

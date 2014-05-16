@@ -47,7 +47,7 @@ public class Runner {
              : System.getProperties().entrySet()) {  
             String key = (String)entry.getKey();  
             String value = (String)entry.getValue();  
-            String[] keyParts = key.split("\\.");
+            String[] keyParts = key.split("\\.", 3);
 
             if (keyParts.length < 3 || !keyParts[0].equals("dpu")) {
                 continue;
@@ -93,7 +93,17 @@ public class Runner {
                     "DPU with index " + dpuIndex + " has an invalid version.");
             }
 
-            dpus.add(new Dpu(id, baseUrl, version));
+            String outputSchemaId = map.get("outputSchemaId");
+
+            Map<String, String> params = new HashMap<String, String>();
+            for (String key : map.keySet()) {
+                String[] keyParts = key.split("\\.", 2);
+                if (keyParts.length == 2 && keyParts[0].equals("param")) {
+                    params.put(keyParts[1], map.get(key));
+                }
+            }
+
+            dpus.add(new Dpu(id, baseUrl, version, params, outputSchemaId));
         }
 
         for (Dpu dpu : dpus) {
