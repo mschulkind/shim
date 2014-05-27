@@ -143,6 +143,8 @@ public abstract class OAuth2Authorization implements ShimAuthorization {
 		String domain = shim.getDomain();
 
 		// Build the authorize URL.
+		String authorizeId =
+		    ExternalAuthorizationInformation.getNewAuthorizeId();
 		StringBuilder authorizeUrlBuilder =
 		    new StringBuilder(getAuthorizeUrl().toString());
         try {
@@ -150,6 +152,9 @@ public abstract class OAuth2Authorization implements ShimAuthorization {
             authorizeUrlBuilder
                 .append(
                     "&client_id=" + URLEncoder.encode(getClientId(), "UTF-8"));
+            authorizeUrlBuilder
+                .append(
+                    "&state=" + URLEncoder.encode(authorizeId, "UTF-8"));
             authorizeUrlBuilder
                 .append(
                     "&redirect_uri=" +
@@ -182,7 +187,7 @@ public abstract class OAuth2Authorization implements ShimAuthorization {
 			new ExternalAuthorizationInformation(
 				username,
 				domain,
-				ExternalAuthorizationInformation.getNewAuthorizeId(),
+                authorizeId,
 				authorizeUrl,
 				clientRedirectUri,
 				null);
